@@ -1,0 +1,257 @@
+[
+  {
+    "op": "core/column-addition",
+    "description": "Create column dedupe_hash at index 8 based on column review_body using expression grel:md5(cells['amazon_identifier'].value + value + cells['review_date'].value + cells['review_body'].value)",
+    "engineConfig": {
+      "mode": "row-based",
+      "facets": [
+        {
+          "selectNumeric": true,
+          "expression": "grel:facetCount(value, \"value\", \"dedupe_hash\")",
+          "selectBlank": true,
+          "selectNonNumeric": true,
+          "selectError": true,
+          "name": "dedupe_hash",
+          "from": 380,
+          "to": 390,
+          "type": "range",
+          "columnName": "dedupe_hash"
+        }
+      ]
+    },
+    "newColumnName": "dedupe_hash",
+    "columnInsertIndex": 8,
+    "baseColumnName": "review_body",
+    "expression": "grel:md5(cells['amazon_identifier'].value + value + cells['review_date'].value + cells['review_body'].value)",
+    "onError": "set-to-blank"
+  },
+  {
+    "op": "core/column-move",
+    "description": "Move column dedupe_hash to position 0",
+    "columnName": "dedupe_hash",
+    "index": 0
+  },
+  {
+    "op": "core/blank-down",
+    "description": "Blank down cells in column dedupe_hash",
+    "engineConfig": {
+      "mode": "row-based",
+      "facets": []
+    },
+    "columnName": "dedupe_hash"
+  },
+  {
+    "op": "core/row-removal",
+    "description": "Remove rows",
+    "engineConfig": {
+      "mode": "row-based",
+      "facets": [
+        {
+          "omitError": false,
+          "expression": "value",
+          "selectBlank": true,
+          "selection": [],
+          "selectError": false,
+          "invert": false,
+          "name": "dedupe_hash",
+          "omitBlank": false,
+          "type": "list",
+          "columnName": "dedupe_hash"
+        }
+      ]
+    }
+  },
+  {
+    "op": "core/text-transform",
+    "description": "Text transform on cells in column review_date using expression grel:value.split('on')[0]",
+    "engineConfig": {
+      "mode": "row-based",
+      "facets": [
+        {
+          "mode": "regex",
+          "invert": false,
+          "caseSensitive": false,
+          "query": "^on",
+          "name": "review_date",
+          "type": "text",
+          "columnName": "review_date"
+        }
+      ]
+    },
+    "columnName": "review_date",
+    "expression": "grel:value.split('on')[0]",
+    "onError": "keep-original",
+    "repeat": false,
+    "repeatCount": 10
+  },
+  {
+    "op": "core/text-transform",
+    "description": "Text transform on cells in column review_date using expression grel:value.toDate()",
+    "engineConfig": {
+      "mode": "record-based",
+      "facets": []
+    },
+    "columnName": "review_date",
+    "expression": "grel:value.toDate()",
+    "onError": "keep-original",
+    "repeat": false,
+    "repeatCount": 10
+  },
+  {
+    "op": "core/text-transform",
+    "description": "Text transform on cells in column number_of_stars using expression grel:if(value.split(\" \")[0].length() < 2, value.split(\" \")[0], value.split(\" \")[0][0]).toNumber()",
+    "engineConfig": {
+      "mode": "row-based",
+      "facets": []
+    },
+    "columnName": "number_of_stars",
+    "expression": "grel:if(value.split(\" \")[0].length() < 2, value.split(\" \")[0], value.split(\" \")[0][0]).toNumber()",
+    "onError": "keep-original",
+    "repeat": false,
+    "repeatCount": 10
+  },
+  {
+    "op": "core/text-transform",
+    "description": "Text transform on cells in column number_found_helpful using expression grel:if(isNull(value.strip().match(/^([A-Za-z].*)/)), value.strip().split(\" \")[0].replace(\",\", \"\"), if(value.length() < 3, \"\", if(value.strip().startsWith(\"One\"), 1, 0))).toNumber()",
+    "engineConfig": {
+      "mode": "row-based",
+      "facets": [
+        {
+          "selectNumeric": false,
+          "expression": "value",
+          "selectBlank": true,
+          "selectNonNumeric": true,
+          "selectError": true,
+          "name": "number_found_helpful",
+          "from": 0,
+          "to": 1500,
+          "type": "range",
+          "columnName": "number_found_helpful"
+        }
+      ]
+    },
+    "columnName": "number_found_helpful",
+    "expression": "grel:if(isNull(value.strip().match(/^([A-Za-z].*)/)), value.strip().split(\" \")[0].replace(\",\", \"\"), if(value.length() < 3, \"\", if(value.strip().startsWith(\"One\"), 1, 0))).toNumber()",
+    "onError": "keep-original",
+    "repeat": false,
+    "repeatCount": 10
+  },
+  {
+    "op": "core/text-transform",
+    "description": "Text transform on cells in column verified_purchase using expression grel:if(value.contains(\"out\"), \"\", if(value.startsWith(\"Verified\"), 1, 0))",
+    "engineConfig": {
+      "mode": "row-based",
+      "facets": [
+        {
+          "selectNumeric": false,
+          "expression": "value",
+          "selectBlank": true,
+          "selectNonNumeric": true,
+          "selectError": true,
+          "name": "verified_purchase",
+          "from": 0,
+          "to": 1.01,
+          "type": "range",
+          "columnName": "verified_purchase"
+        }
+      ]
+    },
+    "columnName": "verified_purchase",
+    "expression": "grel:if(value.contains(\"out\"), \"\", if(value.startsWith(\"Verified\"), 1, 0))",
+    "onError": "keep-original",
+    "repeat": false,
+    "repeatCount": 10
+  },
+  {
+    "op": "core/text-transform",
+    "description": "Text transform on cells in column product_price using expression grel:if(value.contains(\"Not\"), \"\", value.split(\"-\")[0].replace(\"$\",\"\").replace(\",\",\"\")).toNumber()",
+    "engineConfig": {
+      "mode": "row-based",
+      "facets": [
+        {
+          "selectNumeric": false,
+          "expression": "value",
+          "selectBlank": true,
+          "selectNonNumeric": true,
+          "selectError": true,
+          "name": "product_price",
+          "from": 0,
+          "to": 250,
+          "type": "range",
+          "columnName": "product_price"
+        }
+      ]
+    },
+    "columnName": "product_price",
+    "expression": "grel:if(value.contains(\"Not\"), \"\", value.split(\"-\")[0].replace(\"$\",\"\").replace(\",\",\"\")).toNumber()",
+    "onError": "keep-original",
+    "repeat": false,
+    "repeatCount": 10
+  },
+  {
+    "op": "core/column-removal",
+    "description": "Remove column dedupe_hash",
+    "columnName": "dedupe_hash"
+  },
+  {
+    "op": "core/text-transform",
+    "description": "Text transform on cells in column review_date using expression grel:value.replace(' ', '').toDate()",
+    "engineConfig": {
+      "mode": "row-based",
+      "facets": [
+        {
+          "selectNonTime": true,
+          "expression": "value",
+          "selectBlank": true,
+          "selectError": true,
+          "selectTime": false,
+          "name": "review_date",
+          "from": 900388800000,
+          "to": 1,
+          "type": "timerange",
+          "columnName": "review_date"
+        },
+        {
+          "mode": "regex",
+          "invert": false,
+          "caseSensitive": false,
+          "query": "^[0-9]",
+          "name": "review_date",
+          "type": "text",
+          "columnName": "review_date"
+        }
+      ]
+    },
+    "columnName": "review_date",
+    "expression": "grel:value.replace(' ', '').toDate()",
+    "onError": "keep-original",
+    "repeat": false,
+    "repeatCount": 10
+  },
+  {
+    "op": "core/text-transform",
+    "description": "Text transform on cells in column review_date using expression grel:value.strip().replace(',', '').replace(' ', '-').toDate()",
+    "engineConfig": {
+      "mode": "row-based",
+      "facets": [
+        {
+          "selectNonTime": true,
+          "expression": "value",
+          "selectBlank": true,
+          "selectError": true,
+          "selectTime": false,
+          "name": "review_date",
+          "from": 900388800000,
+          "to": 1525060800000,
+          "type": "timerange",
+          "columnName": "review_date"
+        }
+      ]
+    },
+    "columnName": "review_date",
+    "expression": "grel:value.strip().replace(',', '').replace(' ', '-').toDate()",
+    "onError": "keep-original",
+    "repeat": false,
+    "repeatCount": 10
+  }
+]

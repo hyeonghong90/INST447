@@ -1,0 +1,64 @@
+[
+  {
+    "op": "core/column-addition",
+    "description": "Create column dedupe_hash at index 8 based on column review_body using expression grel:md5(cells['amazon_identifier'].value + value + cells['review_date'].value)",
+    "engineConfig": {
+      "mode": "row-based",
+      "facets": [
+        {
+          "selectNumeric": true,
+          "expression": "grel:facetCount(value, \"value\", \"dedupe_hash\")",
+          "selectBlank": true,
+          "selectNonNumeric": true,
+          "selectError": true,
+          "name": "dedupe_hash",
+          "from": 380,
+          "to": 390,
+          "type": "range",
+          "columnName": "dedupe_hash"
+        }
+      ]
+    },
+    "newColumnName": "dedupe_hash",
+    "columnInsertIndex": 8,
+    "baseColumnName": "review_body",
+    "expression": "grel:md5(cells['amazon_identifier'].value + value + cells['review_date'].value + cells['review_body'].value)",
+    "onError": "set-to-blank"
+  },
+  {
+    "op": "core/column-move",
+    "description": "Move column dedupe_hash to position 0",
+    "columnName": "dedupe_hash",
+    "index": 0
+  },
+  {
+    "op": "core/blank-down",
+    "description": "Blank down cells in column dedupe_hash",
+    "engineConfig": {
+      "mode": "row-based",
+      "facets": []
+    },
+    "columnName": "dedupe_hash"
+  },
+  {
+    "op": "core/row-removal",
+    "description": "Remove rows",
+    "engineConfig": {
+      "mode": "row-based",
+      "facets": [
+        {
+          "omitError": false,
+          "expression": "value",
+          "selectBlank": true,
+          "selection": [],
+          "selectError": false,
+          "invert": false,
+          "name": "dedupe_hash",
+          "omitBlank": false,
+          "type": "list",
+          "columnName": "dedupe_hash"
+        }
+      ]
+    }
+  }
+]
